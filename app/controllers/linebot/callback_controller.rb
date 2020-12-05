@@ -1,4 +1,4 @@
-class LineBot::ClientController < ApplicationController
+class Linebot::CallbackController < ApplicationController
 
   def create
     body = request.body.read
@@ -8,7 +8,7 @@ class LineBot::ClientController < ApplicationController
       error 400 do 'Bad Request' end
     end
 
-    clinent = LineBot.client
+    client = LineBot.client
     events = client.parse_events_from(body)
 
     events.each do |event|
