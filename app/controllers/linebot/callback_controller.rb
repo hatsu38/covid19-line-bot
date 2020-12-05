@@ -1,4 +1,5 @@
 class Linebot::CallbackController < ApplicationController
+  protect_from_forgery
 
   def create
     body = request.body.read
