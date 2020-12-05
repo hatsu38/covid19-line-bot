@@ -80,6 +80,4 @@ test:
 #
 production:
   <<: *default
-  database: covid19_line_bot_production
-  username: covid19_line_bot
-  password: <%= ENV['COVID19_LINE_BOT_DATABASE_PASSWORD'] %>
+  url: <%= ENV['DATABASE_URL'] %>
