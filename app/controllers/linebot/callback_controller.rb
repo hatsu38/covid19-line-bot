@@ -7,7 +7,7 @@ class Linebot::CallbackController < ApplicationController
     signature = request.env['HTTP_X_LINE_SIGNATURE']
 
     unless client.validate_signature(body, signature)
-      return head :bad_request
+      returnhead :bad_request
     end
 
     events = client.parse_events_from(body)
@@ -17,9 +17,10 @@ class Linebot::CallbackController < ApplicationController
       when Line::Bot::Event::Message
         case event.type
         when Line::Bot::Event::MessageType::Text
+          resent_prefecture_info = Api::Covid19.find_by_name(event.message['text'])
           message = {
             type: 'text',
-            text: event.message['text'] + "新たに発生した患者数は2人です"
+            text: event.message['text'] + "の累積陽性者数は#{resent_prefecture_info['npatients']}人です"
           }
           client.reply_message(event['replyToken'], message)
         when Line::Bot::Event::MessageType::Image, Line::Bot::Event::MessageType::Video
