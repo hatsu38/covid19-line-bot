@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
-  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
-  # post '/callback' => 'linebot#callback'
+  root "health_check#index"
   namespace :linebot do
     resources :callback, only: :create
   end
+  get "*anything" => "application#rescue_not_found"
 end
