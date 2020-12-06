@@ -12,7 +12,7 @@ AllCops:
     - bin/*
     - "node_modules/**/*"
     - "lib/tasks/auto_annotate_models.rake"
-    - "spec/rails_helper.rb"
+    - "spec/*.rb"
     - config/**/**.rb
     - config.ru
 

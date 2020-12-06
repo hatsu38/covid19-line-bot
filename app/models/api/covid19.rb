@@ -1,10 +1,8 @@
 class Api::Covid19
-  API_BASE_URL = "https://opendata.corona.go.jp/api/Covid19JapanAll"
+  API_BASE_URL = "https://opendata.corona.go.jp/api/Covid19JapanAll".freeze
   def self.find_by_name(prefecture_name)
-    self.api_request(prefecture_name, 0)
+    api_request(prefecture_name, 0)
   end
-
-  private
 
   def self.api_request(prefecture_name, count = 0)
     uri = URI(API_BASE_URL)
@@ -17,6 +15,6 @@ class Api::Covid19
 
     count += 1
     sleep(0.2)
-    self.api_request(prefecture_name, count)
+    api_request(prefecture_name, count)
   end
 end
