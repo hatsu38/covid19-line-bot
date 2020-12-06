@@ -1,0 +1,61 @@
+name: RSpec
+on: [pull_request]
+jobs:
+  build_and_test:
+    name: Build And Test
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:11.5
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      RAILS_ENV: test
+      BUNDLE_PATH: ./vendor/bundle
+      DATABASE_NAME: covid19_line_bot_test
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: ""
+      DATABASE_HOST: 127.0.0.1
+      DATABASE_PORT: 5432
+      TZ: Asia/Tokyo
+      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Ruby 2.6.5のセットアップ
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.6.5
+      - name: pg gem の依存関係のインストール
+        run: |
+          sudo apt-get update; sudo apt-get install libpq-dev
+      - name: node v10のセットアップ
+        uses: actions/setup-node@v1
+        with:
+          node-version: '10.x'
+      - name: yarn install
+        run: |
+          yarn install --check-files
+      - name: gem install
+        run: |
+          gem install bundler -v 1.17.3
+      - name: bundler install
+        run: |
+          bundle check || bundle install --path vendor/bundle --jobs 4 --retry 3
+      - name: Setup Database
+        run: |
+          bundle exec rails db:create db:schema:load --trace
+      - name: Exec RSpec
+        run: |
+          bundle exec rspec --format documentation --force-color --backtrace
+      - name: Exec Brakeman
+        run: |
+          bundle exec brakeman -A
+      - name: Exec rubocop
+        run: |
+          bundle exec rubocop --extra-details --display-style-guide --parallel --display-cop-names
