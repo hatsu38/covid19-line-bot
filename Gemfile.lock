@@ -80,6 +80,7 @@ GEM
       concurrent-ruby (~> 1.0)
     jbuilder (2.10.1)
       activesupport (>= 5.0.0)
+    jp_prefecture (0.10.0)
     line-bot-api (1.16.0)
     listen (3.3.3)
       rb-fsevent (~> 0.10, >= 0.10.3)
@@ -219,6 +220,7 @@ DEPENDENCIES
   bullet
   byebug
   jbuilder (~> 2.7)
+  jp_prefecture
   line-bot-api
   listen (~> 3.2)
   pg (>= 0.18, < 2.0)

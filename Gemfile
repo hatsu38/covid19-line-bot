@@ -7,6 +7,7 @@ ruby '2.6.5'
 gem 'rails', '~> 6.0.3', '>= 6.0.3.4'
 
 gem 'line-bot-api' # LINE Bot
+gem 'jp_prefecture' # 都道府県データを扱う
 
 # Use postgresql as the database for Active Record
 gem 'pg', '>= 0.18', '< 2.0'
