@@ -83,7 +83,4 @@ test:
 #
 production:
   <<: *default
-  port: <%= ENV['DATABASE_PORT'] || 5432 %>
-  username: <%= ENV['DATABASE_USER'] || '' %>
-  password: <%= ENV['DATABASE_PASSWORD'] || '' %>
-  database: <%= ENV['DATABASE_NAME'] || 'covid19_line_bot' %>
+  url: <%= ENV['DATABASE_URL'] %>
