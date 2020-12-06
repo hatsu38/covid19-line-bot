@@ -1,7 +1,7 @@
 class Linebot::CallbackController < ApplicationController
   protect_from_forgery
 
-  # rubocop:disable Metrics/AbcSize
+  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/BlockLength
   def create
     client = LineBot.client
     body = request.body.read
@@ -12,9 +12,9 @@ class Linebot::CallbackController < ApplicationController
     events = client.parse_events_from(body)
 
     events.each do |event|
+      user = User.find_or_create_by(line_id: event["source"]["userId"])
       case event
       when Line::Bot::Event::Follow
-        User.find_or_create_by(line_id: event["source"]["userId"])
         message = {
           type: "text",
           text: "お住まいの都道府県名を入力してください"
@@ -23,12 +23,18 @@ class Linebot::CallbackController < ApplicationController
       when Line::Bot::Event::Message
         case event.type
         when Line::Bot::Event::MessageType::Text
-          resent_prefecture_info = Api::Covid19.find_by(name: event.message["text"])
-          message = {
-            type: "text",
-            text: event.message["text"] + "の累積陽性者数は#{resent_prefecture_info['npatients']}人です"
-          }
-          client.reply_message(event["replyToken"], message)
+          case event.message["text"]
+          when "現在の感染者数"
+            resent_prefecture_info = Api::Covid19.find_by(prefecture_name: user.prefecture.name)
+            message = {
+              type: "text",
+              text: user.prefecture.name + "の累積陽性者数は#{resent_prefecture_info['npatients']}人です"
+            }
+            client.reply_message(event["replyToken"], message)
+          when "自分の地域を設定"
+            message = MessageTemplate::MY_AREA_SETTING
+            client.reply_message(event["replyToken"], message)
+          end
         when Line::Bot::Event::MessageType::Image, Line::Bot::Event::MessageType::Video
           response = client.get_message_content(event.message["id"])
           tf = Tempfile.open("content")
@@ -37,5 +43,5 @@ class Linebot::CallbackController < ApplicationController
       end
     end
   end
-  # rubocop:enable Metrics/AbcSize
+  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/BlockLength
 end
