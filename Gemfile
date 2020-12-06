@@ -37,7 +37,11 @@ group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'pry-rails' # Debug
   gem "pry-byebug" # Debug
-  gem "rubocop" # Lint
+  gem "rubocop" # Lint Announce
+  gem "rubocop-performance" # Lint Announce
+  gem "rubocop-rails" # Lint Announce
+  gem "rubocop-rspec" # Lint Announce
+  gem "rubocop-thread_safety" # Lint Announce
 end
 
 group :development do
@@ -50,6 +54,14 @@ group :development do
   gem "annotate" # Table Info write to model
   gem "brakeman" # security
   gem "bullet" # N+1
+end
+
+group :test do
+  gem 'rspec-rails'
+  gem 'factory_bot_rails'
+  gem 'database_cleaner'
+  gem 'database_rewinder'
+  gem 'shoulda-matchers'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
