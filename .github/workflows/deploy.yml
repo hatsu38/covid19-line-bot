@@ -1,0 +1,19 @@
+name: Deployment
+on:
+  push:
+    branches:
+      - master
+jobs:
+  deploy_production:
+    name: Herokuにデプロイ
+    needs: build_and_test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Deploy to Heroku Production
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+        run: |
+          git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master

@@ -1,7 +1,8 @@
 name: Build And Test
-on: [pull_request]
+on: [push, pull_request]
 jobs:
   build_and_test:
+    name: Exec RSpec rubocop brakeman
     runs-on: ubuntu-latest
     services:
       postgres:
