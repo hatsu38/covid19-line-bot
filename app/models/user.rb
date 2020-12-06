@@ -9,6 +9,10 @@
 #  updated_at      :datetime         not null
 #
 class User < ApplicationRecord
+  DEFUALT_PREFECTURE = "東京都"
+
+  # デフォルトの都道府県は東京都とする
+  attribute :prefecture_code, :integer, default: Prefecture.find_code_by_name(DEFUALT_PREFECTURE)
   include JpPrefecture
 
   jp_prefecture :prefecture_code

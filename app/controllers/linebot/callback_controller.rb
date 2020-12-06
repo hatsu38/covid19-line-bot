@@ -14,6 +14,13 @@ class Linebot::CallbackController < ApplicationController
 
     events.each do |event|
       case event
+      when Line::Bot::Event::Follow
+        user = User.find_or_create_by(line_id: event['source']['userId'])
+        message = {
+          type: 'text',
+          text: "お住まいの都道府県名を入力してください"
+        }
+        client.reply_message(event['replyToken'], message)
       when Line::Bot::Event::Message
         case event.type
         when Line::Bot::Event::MessageType::Text
