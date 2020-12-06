@@ -1,5 +1,5 @@
 name: Build And Test
-on: [push, pull_request]
+on: push
 jobs:
   build_and_test:
     name: Exec RSpec rubocop brakeman
