@@ -1,5 +1,9 @@
 name: Build And Test
-on: push
+on:
+  pull_request:
+  push:
+    branches:
+      - master
 jobs:
   build_and_test:
     name: Exec RSpec rubocop brakeman
@@ -66,8 +70,8 @@ jobs:
       - name: Exec rubocop
         run: |
           bundle exec rubocop --extra-details --display-style-guide --parallel --display-cop-names
-  slackNotification:
-    name: Slack Notification by Github Actions
+  test_slack_notification:
+    name: 【Test Result】Slack Notification by Github Actions
     runs-on: ubuntu-latest
     needs: build_and_test
     env:
@@ -86,4 +90,38 @@ jobs:
         env:
           SLACK_MESSAGE: Fail rubocop, rspec, brakeman
           SLACK_TITLE: Test Failure!👾
+          SLACK_COLOR: "#dc3545"
+  deploy_production:
+    name: Herokuにデプロイ
+    needs: build_and_test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Deploy to Heroku Production
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+        run: |
+          git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
+  deploy_slack_notification:
+    name: 【Deploy Result】Slack Notification by Github Actions
+    runs-on: ubuntu-latest
+    needs: deploy_production
+    env:
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+      SLACK_USERNAME: Github Actions Result
+    steps:
+      - name: 【Deploy Result】Slack Notification on Success
+        uses: rtCamp/action-slack-notify@v2
+        if: success()
+        env:
+          SLACK_TITLE: Deploy Complete!🎉✨
+          SLACK_MESSAGE: Heroku Deploy Success!
+      - name: 【Deploy Result】Slack Notification on Failure
+        uses: rtCamp/action-slack-notify@v2
+        if: failure()
+        env:
+          SLACK_TITLE: Deploy Failure!👾
+          SLACK_MESSAGE: Heroku Deploy Fail!
           SLACK_COLOR: "#dc3545"
