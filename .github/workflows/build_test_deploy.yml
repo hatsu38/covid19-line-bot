@@ -99,11 +99,8 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
       - name: Deploy to Heroku Production
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
         run: |
-          git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
+          git push https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git master
   deploy_slack_notification:
     name: 【Deploy Result】Slack Notification by Github Actions
     runs-on: ubuntu-latest
