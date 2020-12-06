@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
-  if Rails.env.production? || Rails.env.staging?
+  if Rails.env.production?
     rescue_from StandardError, with: :rescue_internal_error
     rescue_from ActionController::RoutingError, with: :rescue_not_found
     rescue_from ActiveRecord::RecordNotFound, with: :rescue_not_found
@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
       #{error&.message},
       #{error&.class}"
     )
-    render json: { message: 'not found', status: 404 }
+    render json: { message: "not found", status: 404 }
   end
 
   def rescue_internal_error(error = nil)
@@ -22,7 +22,6 @@ class ApplicationController < ActionController::Base
       #{error&.message},
       #{error&.class}"
     )
-    render json: { message: 'internal error', status: 500 }
+    render json: { message: "internal error", status: 500 }
   end
 end
-
