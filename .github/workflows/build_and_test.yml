@@ -1,0 +1,124 @@
+name: Build And Test And Deploy
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+jobs:
+  build_and_test:
+    name: Exec RSpec rubocop brakeman
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:11.5
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      RAILS_ENV: test
+      BUNDLE_PATH: ./vendor/bundle
+      DATABASE_NAME: covid19_line_bot_test
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: ""
+      DATABASE_HOST: 127.0.0.1
+      DATABASE_PORT: 5432
+      TZ: Asia/Tokyo
+      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Cache Gemfile.lock
+        uses: actions/cache@v2
+        with:
+          path: ./vendor/bundle
+          key: ${{ runner.os }}-rails-bundle-v1-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rails-bundle-v1-
+      - name: Ruby 2.6.5のセットアップ
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.6.5
+      - name: pg gem の依存関係のインストール
+        run: |
+          sudo apt-get update; sudo apt-get install libpq-dev
+      - name: node v10のセットアップ
+        uses: actions/setup-node@v1
+        with:
+          node-version: '10.x'
+      - name: yarn install
+        run: |
+          yarn install --check-files
+      - name: gem install
+        run: |
+          gem install bundler -v 1.17.3
+      - name: bundler install
+        run: |
+          bundle check || bundle install --path vendor/bundle --jobs 4 --retry 3
+      - name: Setup Database
+        run: |
+          bundle exec rails db:create db:schema:load --trace
+      - name: Exec RSpec
+        run: |
+          bundle exec rspec --format documentation --force-color --backtrace
+      - name: Exec Brakeman
+        run: |
+          bundle exec brakeman -A
+      - name: Exec rubocop
+        run: |
+          bundle exec rubocop --extra-details --display-style-guide --parallel --display-cop-names
+  test_slack_notification:
+    name: 【Test Result】Slack Notification by Github Actions
+    runs-on: ubuntu-latest
+    needs: build_and_test
+    env:
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+      SLACK_USERNAME: Github Actions Result
+    steps:
+      - name: Slack Notification on Success
+        uses: rtCamp/action-slack-notify@v2
+        if: success()
+        env:
+          SLACK_MESSAGE: Pass rubocop, rspec, brakeman
+          SLACK_TITLE: Test Complete!🎉✨
+      - name: Slack Notification on Failure
+        uses: rtCamp/action-slack-notify@v2
+        if: failure()
+        env:
+          SLACK_MESSAGE: Fail rubocop, rspec, brakeman
+          SLACK_TITLE: Test Failure!👾
+          SLACK_COLOR: "#dc3545"
+  deploy_production:
+    name: Herokuにデプロイ
+    needs: build_and_test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Deploy to Heroku Production
+        run: |
+          git push https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git master
+  deploy_slack_notification:
+    name: 【Deploy Result】Slack Notification by Github Actions
+    runs-on: ubuntu-latest
+    needs: deploy_production
+    env:
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+      SLACK_USERNAME: Github Actions Result
+    steps:
+      - name: 【Deploy Result】Slack Notification on Success
+        uses: rtCamp/action-slack-notify@v2
+        if: success()
+        env:
+          SLACK_TITLE: Deploy Complete!🎉✨
+          SLACK_MESSAGE: Heroku Deploy Success!
+      - name: 【Deploy Result】Slack Notification on Failure
+        uses: rtCamp/action-slack-notify@v2
+        if: failure()
+        env:
+          SLACK_TITLE: Deploy Failure!👾
+          SLACK_MESSAGE: Heroku Deploy Fail!
+          SLACK_COLOR: "#dc3545"
