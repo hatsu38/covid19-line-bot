@@ -1,8 +1,7 @@
-name: RSpec
+name: Build And Test
 on: [pull_request]
 jobs:
   build_and_test:
-    name: Build And Test
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -27,6 +26,13 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v2
+      - name: Cache Gemfile.lock
+        uses: actions/cache@v2
+        with:
+          path: ./vendor/bundle
+          key: ${{ runner.os }}-rails-bundle-v1-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rails-bundle-v1-
       - name: Ruby 2.6.5のセットアップ
         uses: ruby/setup-ruby@v1
         with:
