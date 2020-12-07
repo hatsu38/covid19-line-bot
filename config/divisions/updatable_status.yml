@@ -6,3 +6,7 @@
   type: prefecture_code_updatable
   name: 都道府県を更新可能
   note: "自分の地域の都道府県情報の更新が可能です"
+- id: 2
+  type: remind_time_updatable
+  name: リマインド日時を更新可能
+  note: "リマインド日時の更新が可能です"

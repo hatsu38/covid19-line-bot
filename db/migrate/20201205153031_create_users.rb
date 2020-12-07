@@ -4,6 +4,7 @@ class CreateUsers < ActiveRecord::Migration[6.0]
       t.string :line_id, null: false
       t.integer :prefecture_code, null: false
       t.integer :updatable_status_id, null: false, deafult: 0
+      t.integer :remind_time_id, null: false, deafult: 0
 
       t.timestamps
     end
