@@ -33,14 +33,14 @@ class User < ApplicationRecord
   belongs_to_active_hash :remind_time
 
   def transit_to_updated!
-    self.update(updatable_status: DEFUALT_UPDATABLE_STATUS)
+    update(updatable_status: DEFUALT_UPDATABLE_STATUS)
   end
 
   def transit_to_prefecture_code_updatable!
-    self.update(updatable_status: UpdatableStatus::PREFECTURE_CODE_UPDATABLE)
+    update(updatable_status: UpdatableStatus::PREFECTURE_CODE_UPDATABLE)
   end
 
   def transit_to_remind_time_updatable!
-    self.update(updatable_status: UpdatableStatus::REMIND_TIME_UPDATABLE)
+    update(updatable_status: UpdatableStatus::REMIND_TIME_UPDATABLE)
   end
 end

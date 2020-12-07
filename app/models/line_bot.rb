@@ -25,8 +25,8 @@ class LineBot
 
   def text_message(text)
     {
-        "type" => "text",
-        "text" => text
+      "type" => "text",
+      "text" => text
     }
   end
 end
