@@ -1,0 +1,8 @@
+- id: 0
+  type: updated
+  name: 更新済
+  note: "情報の更新は出来ません"
+- id: 1
+  type: prefecture_code_updatable
+  name: 都道府県を更新可能
+  note: "自分の地域の都道府県情報の更新が可能です"
