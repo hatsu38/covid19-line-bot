@@ -1,7 +1,7 @@
 class Linebot::CallbackController < ApplicationController
   protect_from_forgery
 
-  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/BlockLength
+  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/BlockLength, Metrics/PerceivedComplexity
   def create
     client = LineBot.client
     body = request.body.read
@@ -21,25 +21,33 @@ class Linebot::CallbackController < ApplicationController
       when Line::Bot::Event::Message
         case event.type
         when Line::Bot::Event::MessageType::Text
-          case event.message["text"]
-          when "キャンセル"
+          recive_text = recive_text(event)
+          new_pref_code = JpPrefecture::Prefecture.find_code_by_name(recive_text)
+          new_remind_time = RemindTime.find_by(name: recive_text)
+          if new_pref_code && user.prefecture_code_updatable?
+            ApplicationRecord.transaction { user.update_prefecture(new_pref_code) }
+            message = send_text("地域を「#{user.prefecture.name}」に変更しました")
+          elsif new_pref_code
+            pref_name = JpPrefecture::Prefecture.find(new_pref_code)&.name
+            resent_prefecture_info = Api::Covid19.find_by(prefecture_name: pref_name)
+            message = send_text("#{pref_name}の累積陽性者数は#{resent_prefecture_info['npatients']}人です")
+          elsif new_remind_time && user.remind_time_updatable?
+            ApplicationRecord.transaction { user.update_remind_time(new_remind_time.id) }
+            message = send_text("毎日「#{new_remind_time.name}」に感染者数をお知らせします")
+          elsif recive_text == "キャンセル"
             user.transit_to_updated!
-          when "現在の感染者数"
+            message = send_text("キャンセルしました")
+          elsif recive_text == "現在の感染者数"
             resent_prefecture_info = Api::Covid19.find_by(prefecture_name: user.prefecture.name)
-            message = {
-              type: "text",
-              text: user.prefecture.name + "の累積陽性者数は#{resent_prefecture_info['npatients']}人です"
-            }
-            client.reply_message(event["replyToken"], message)
-          when "自分の地域を設定"
+            message = send_text("#{user.prefecture.name}の累積陽性者数は#{resent_prefecture_info['npatients']}人です")
+          elsif recive_text == "自分の地域を設定"
             user.transit_to_prefecture_code_updatable!
             message = MessageTemplate::MY_AREA_SETTING
-            client.reply_message(event["replyToken"], message)
-          when "通知時間を設定"
+          elsif recive_text == "通知時間を設定"
             user.transit_to_remind_time_updatable!
             message = MessageTemplate::REMIND_TIME_SETTING
-            client.reply_message(event["replyToken"], message)
           end
+          client.reply_message(event["replyToken"], message)
         when Line::Bot::Event::MessageType::Image, Line::Bot::Event::MessageType::Video
           response = client.get_message_content(event.message["id"])
           tf = Tempfile.open("content")
@@ -48,5 +56,18 @@ class Linebot::CallbackController < ApplicationController
       end
     end
   end
-  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/BlockLength
+  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/BlockLength, Metrics/PerceivedComplexity
+
+  private
+
+  def recive_text(event)
+    event.message["text"]
+  end
+
+  def send_text(text)
+    {
+      type: "text",
+      text: text
+    }
+  end
 end
