@@ -16,4 +16,17 @@ class LineBot
     end
   end
   # rubocop:enable Metrics/AbcSize
+
+  def reply_text(reply_token, message)
+    client.reply_message(reply_token, text_message(message))
+  end
+
+  private
+
+  def text_message(text)
+    {
+      "type" => "text",
+      "text" => text
+    }
+  end
 end

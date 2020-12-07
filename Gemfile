@@ -6,6 +6,7 @@ ruby "2.6.5"
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem "rails", "~> 6.0.3", ">= 6.0.3.4"
 
+gem "active_hash" # HashをActiveRecordのように使う
 gem "jp_prefecture" # 都道府県データを扱う
 gem "line-bot-api" # LINE Bot
 

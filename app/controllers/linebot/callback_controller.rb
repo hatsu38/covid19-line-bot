@@ -15,15 +15,15 @@ class Linebot::CallbackController < ApplicationController
       user = User.find_or_create_by(line_id: event["source"]["userId"])
       case event
       when Line::Bot::Event::Follow
-        message = {
-          type: "text",
-          text: "お住まいの都道府県名を入力してください"
-        }
+        message = MessageTemplate::MY_AREA_SETTING
+        user.transit_to_prefecture_code_updatable!
         client.reply_message(event["replyToken"], message)
       when Line::Bot::Event::Message
         case event.type
         when Line::Bot::Event::MessageType::Text
           case event.message["text"]
+          when "キャンセル"
+            user.transit_to_updated!
           when "現在の感染者数"
             resent_prefecture_info = Api::Covid19.find_by(prefecture_name: user.prefecture.name)
             message = {
@@ -32,7 +32,12 @@ class Linebot::CallbackController < ApplicationController
             }
             client.reply_message(event["replyToken"], message)
           when "自分の地域を設定"
+            user.transit_to_prefecture_code_updatable!
             message = MessageTemplate::MY_AREA_SETTING
+            client.reply_message(event["replyToken"], message)
+          when "通知時間を設定"
+            user.transit_to_remind_time_updatable!
+            message = MessageTemplate::REMIND_TIME_SETTING
             client.reply_message(event["replyToken"], message)
           end
         when Line::Bot::Event::MessageType::Image, Line::Bot::Event::MessageType::Video

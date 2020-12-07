@@ -18,8 +18,11 @@ ActiveRecord::Schema.define(version: 2020_12_05_153031) do
   create_table "users", force: :cascade do |t|
     t.string "line_id", null: false
     t.integer "prefecture_code", null: false
+    t.integer "updatable_status_id", null: false
+    t.integer "remind_time_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["line_id"], name: "index_users_on_line_id", unique: true
   end
 
 end
