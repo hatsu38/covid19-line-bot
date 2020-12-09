@@ -41,7 +41,11 @@ class Linebot::CallbackController < ApplicationController
           elsif recive_text == "現在の感染者数"
             resent_prefecture_info = Api::Covid19.find_by(prefecture_name: user.prefecture.name)
             previous_day_ratio = Api::Covid19.find_by_previous_day_ratio(prefecture_name: user.prefecture.name)
-            message = send_text("【😷感染者数】\n\n#{user.prefecture.name}の累積陽性者数は#{resent_prefecture_info['npatients']}人です。\n前日比は#{previous_day_ratio}人です。")
+            message = send_text(
+              "【😷感染者数】\n\n
+                        #{user.prefecture.name}の累積陽性者数は#{resent_prefecture_info['npatients']}人です。\n
+                        前日比は#{previous_day_ratio}人です。"
+            )
             user.transit_to_updated!
           elsif recive_text == "自分の地域を設定"
             user.transit_to_prefecture_code_updatable!
