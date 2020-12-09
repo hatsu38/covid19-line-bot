@@ -4,7 +4,7 @@ START_ID = 0
 # 10分ごとに時間分割する
 END_ID = (60 / 10 * 24) - 1
 namespace :generate do
-  desc "イベントをTwitterBotがツイート"
+  desc "リマインド時間の選択肢のymlを作成します。10分毎に設定しています。"
   task remind_time: :environment do
     write_text = ""
     (START_ID..END_ID).each do |id|
