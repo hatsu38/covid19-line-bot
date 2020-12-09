@@ -1,33 +1,35 @@
 class MessageTemplate
-  MY_AREA_SETTING = {
-    "type": "template",
-    "altText": "自分の地域を設定",
-    "template": {
-      "type": "buttons",
-      "actions": [
+  AREA_SETTING = {
+    type: "template",
+    altText: "自分の地域を設定",
+    template: {
+      type: "buttons",
+      actions: [
         {
-          "type": "message",
-          "label": "キャンセル",
-          "text": "キャンセル"
+          type: "message",
+          label: "キャンセル",
+          text: "キャンセル"
         }
       ],
-      "text": "自分の地域を設定します。\nどこの地域の感染者数を知りたいですか？\n\n入力例）東京都, 北海道, 福岡県など"
+      title: "🚗自分の地域を設定",
+      text: "お住まいの都道府県名を入力してください。\n例）東京都, 北海道, 福岡県など"
     }
   }.freeze
 
   REMIND_TIME_SETTING = {
-    "type": "template",
-    "altText": "通知時間を設定",
-    "template": {
-      "type": "buttons",
-      "actions": [
+    type: "template",
+    altText: "自分の地域を設定",
+    template: {
+      type: "buttons",
+      actions: [
         {
-          "type": "message",
-          "label": "キャンセル",
-          "text": "キャンセル"
+          type: "message",
+          label: "キャンセル",
+          text: "キャンセル"
         }
       ],
-      "text": "感染者数をお知らせする時間を設定します。\n\n入力例）0時, 10時, 19時など"
+      title: "⏰通知時間を設定",
+      text: "通知する時間を設定してください。\n10分単位で設定可能です。\n例）0時, 10時30分, 19:50など"
     }
   }.freeze
 end

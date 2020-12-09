@@ -23,7 +23,7 @@ class Linebot::CallbackController < ApplicationController
         when Line::Bot::Event::MessageType::Text
           recive_text = recive_text(event)
           new_pref_code = JpPrefecture::Prefecture.find_code_by_name(recive_text)
-          new_remind_time = RemindTime.find_by(name: recive_text)
+          new_remind_time = RemindTime.find_time(time)
           if new_pref_code && user.prefecture_code_updatable?
             ApplicationRecord.transaction { user.update_prefecture(new_pref_code) }
             message = send_text("地域を「#{user.prefecture.name}」に変更しました")
@@ -42,7 +42,7 @@ class Linebot::CallbackController < ApplicationController
             message = send_text("#{user.prefecture.name}の累積陽性者数は#{resent_prefecture_info['npatients']}人です")
           elsif recive_text == "自分の地域を設定"
             user.transit_to_prefecture_code_updatable!
-            message = MessageTemplate::MY_AREA_SETTING
+            message = MessageTemplate::AREA_SETTING
           elsif recive_text == "通知時間を設定"
             user.transit_to_remind_time_updatable!
             message = MessageTemplate::REMIND_TIME_SETTING

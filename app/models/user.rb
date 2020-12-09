@@ -20,7 +20,7 @@ class User < ApplicationRecord
 
   DEFUALT_PREFECTURE_NAME = "東京都".freeze
   DEFUALT_UPDATABLE_STATUS = UpdatableStatus::UPDATED.freeze
-  DEFUALT_REMIND_TIME = RemindTime::OCLOCK_8.id.freeze
+  DEFUALT_REMIND_TIME = RemindTime::OCLOCK_0800.id.freeze
 
   jp_prefecture :prefecture_code
 
