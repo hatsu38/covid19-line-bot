@@ -30,7 +30,8 @@ class Linebot::CallbackController < ApplicationController
           elsif new_pref_code
             pref_name = JpPrefecture::Prefecture.find(new_pref_code)&.name
             resent_prefecture_info = Api::Covid19.find_by(prefecture_name: pref_name)
-            message = send_text("#{pref_name}の累積陽性者数は#{resent_prefecture_info['npatients']}人です")
+            previous_day_ratio = Api::Covid19.find_by_previous_day_ratio(prefecture_name: pref_name)
+            message = send_text("【😷感染者数】\n\n#{pref_name}の累積陽性者数は#{resent_prefecture_info['npatients']}人です。\n前日比は#{previous_day_ratio}人です。")
           elsif new_remind_time && user.remind_time_updatable?
             ApplicationRecord.transaction { user.update_remind_time(new_remind_time.id) }
             message = send_text("毎日「#{new_remind_time.name_24}」に感染者数をお知らせします")
@@ -39,7 +40,13 @@ class Linebot::CallbackController < ApplicationController
             message = send_text("キャンセルしました")
           elsif recive_text == "現在の感染者数"
             resent_prefecture_info = Api::Covid19.find_by(prefecture_name: user.prefecture.name)
-            message = send_text("#{user.prefecture.name}の累積陽性者数は#{resent_prefecture_info['npatients']}人です")
+            previous_day_ratio = Api::Covid19.find_by_previous_day_ratio(prefecture_name: user.prefecture.name)
+            message = send_text(
+              "【😷感染者数】\n\n
+                        #{user.prefecture.name}の累積陽性者数は#{resent_prefecture_info['npatients']}人です。\n
+                        前日比は#{previous_day_ratio}人です。"
+            )
+            user.transit_to_updated!
           elsif recive_text == "自分の地域を設定"
             user.transit_to_prefecture_code_updatable!
             message = MessageTemplate::AREA_SETTING

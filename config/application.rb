@@ -33,5 +33,9 @@ module Covid19LineBot
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+    Raven.configure do |config|
+      config.environments = %w[production]
+      config.dsn = Rails.application.credentials.sentry_dsn
+    end
   end
 end

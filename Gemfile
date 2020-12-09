@@ -9,6 +9,7 @@ gem "rails", "~> 6.0.3", ">= 6.0.3.4"
 gem "active_hash" # HashをActiveRecordのように使う
 gem "jp_prefecture" # 都道府県データを扱う
 gem "line-bot-api" # LINE Bot
+gem "sentry-raven" # エラー検知
 
 # Use postgresql as the database for Active Record
 gem "pg", ">= 0.18", "< 2.0"
