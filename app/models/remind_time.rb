@@ -8,6 +8,6 @@ class RemindTime < ActiveYaml::Base
 
   def self.find_time(time)
     find_by(name_24: time) || find_by(name_12: time) ||
-    find_by(name_en_12: time) || find_by(time: time) || find_by(time_easy: time)
+      find_by(name_en_12: time) || find_by(time: time) || find_by(time_easy: time)
   end
 end
