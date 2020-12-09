@@ -1,3 +1,4 @@
+# bundle exec batch:remind_covid19_cnt
 namespace :batch do
   desc "10分ごとにLinePushを送ります"
   task remind_covid19_cnt: :environment do
