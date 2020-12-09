@@ -33,7 +33,7 @@ class Linebot::CallbackController < ApplicationController
             message = send_text("#{pref_name}の累積陽性者数は#{resent_prefecture_info['npatients']}人です")
           elsif new_remind_time && user.remind_time_updatable?
             ApplicationRecord.transaction { user.update_remind_time(new_remind_time.id) }
-            message = send_text("毎日「#{new_remind_time.name}」に感染者数をお知らせします")
+            message = send_text("毎日「#{new_remind_time.name_24}」に感染者数をお知らせします")
           elsif recive_text == "キャンセル"
             user.transit_to_updated!
             message = send_text("キャンセルしました")
