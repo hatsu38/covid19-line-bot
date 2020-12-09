@@ -4,7 +4,7 @@ namespace :batch do
   task remind_covid19_cnt: :environment do
     client = LineBot.client
     # ○0分にする
-    time = Time.zone.now.strftime('%H:%M').chop + "0"
+    time = "#{Time.zone.now.strftime('%H:%M').chop}0"
     remind_time = RemindTime.find_time(time)
     User.where(remind_time_id: remind_time.id).each do |user|
       resent_prefecture_info = Api::Covid19.find_by(prefecture_name: user.prefecture.name)
