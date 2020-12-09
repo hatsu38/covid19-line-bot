@@ -51,3 +51,7 @@ Layout/LineLength:
 
 Style/ClassAndModuleChildren:
   EnforcedStyle: compact
+
+# 数字付きの変数名/メソッド名を許可
+Naming/VariableNumber:
+  Enabled: false
