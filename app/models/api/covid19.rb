@@ -8,7 +8,8 @@ class Api::Covid19
 
   def self.find_by_previous_day_ratio(prefecture_name: User::DEFUALT_PREFECTURE)
     response = api_request(prefecture_name, DEFAULT_COUNT)
-    response[0]["npatients"].to_i - response[1]["npatients"].to_i
+    previous_day_ratio = response[0]["npatients"].to_i - response[1]["npatients"].to_i
+    previous_day_ratio >= 0 ? "+#{previous_day_ratio}" : "-#{previous_day_ratio}"
   end
 
   def self.all(prefecture_name: User::DEFUALT_PREFECTURE)
