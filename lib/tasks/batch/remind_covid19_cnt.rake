@@ -12,5 +12,3 @@ namespace :batch do
     end
   end
 end
-
-
