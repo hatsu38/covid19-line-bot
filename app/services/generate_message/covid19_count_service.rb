@@ -18,7 +18,7 @@ class GenerateMessage::Covid19CountService
   end
 
   def pandemic_count(prefecture:, count:, previous_day_ratio:)
-    "【😷感染者数】\n\n#{prefecture}の累積陽性者数は#{count.to_s(:delimited)}人です。\n前日比は#{previous_day_ratio}人です。"
+    "【😷感染者数】\n\n#{prefecture}の累積陽性者数は#{count.to_i.to_s(:delimited)}人です。\n前日比は#{previous_day_ratio}人です。"
   end
 
   def delimited(num)

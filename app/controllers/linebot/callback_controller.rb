@@ -14,7 +14,7 @@ class Linebot::CallbackController < ApplicationController
       user = User.find_or_create_by(line_id: event["source"]["userId"])
       case event
       when Line::Bot::Event::Follow
-        message = MessageTemplate::MY_AREA_SETTING
+        message = GenerateMessage::AreaSettingService.new.execute
         user.transit_to_prefecture_code_updatable!
         client.reply_message(event["replyToken"], message)
       when Line::Bot::Event::Message
@@ -40,7 +40,7 @@ class Linebot::CallbackController < ApplicationController
             user.transit_to_updated!
           elsif recive_text == "自分の地域を設定"
             user.transit_to_prefecture_code_updatable!
-            message = MessageTemplate::AREA_SETTING
+            message = GenerateMessage::AreaSettingService.new.execute
           elsif recive_text == "通知時間を設定"
             user.transit_to_remind_time_updatable!
             message = MessageTemplate::REMIND_TIME_SETTING
