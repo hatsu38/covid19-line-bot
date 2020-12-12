@@ -1,6 +1,5 @@
 class Linebot::CallbackController < ApplicationController
   protect_from_forgery
-  include Message
   # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/BlockLength, Metrics/PerceivedComplexity
   def create
     client = LineBot.client
@@ -29,15 +28,7 @@ class Linebot::CallbackController < ApplicationController
             message = send_text("地域を「#{user.prefecture.name}」に変更しました")
           elsif new_pref_code
             pref_name = JpPrefecture::Prefecture.find(new_pref_code)&.name
-            resent_prefecture_info = Api::Covid19.find_by(prefecture_name: pref_name)
-            previous_day_ratio = Api::Covid19.find_by_previous_day_ratio(prefecture_name: pref_name)
-            message = send_text(
-              pandemic_count(
-                prefecture: pref_name,
-                count: resent_prefecture_info["npatients"],
-                previous_day_ratio: previous_day_ratio
-              )
-            )
+            message = GenerateMessage::Covid19CountService.execute(pref_name)
           elsif new_remind_time && user.remind_time_updatable?
             ApplicationRecord.transaction { user.update_remind_time(new_remind_time.id) }
             message = send_text("毎日「#{new_remind_time.name_24}」に感染者数をお知らせします")
@@ -45,15 +36,7 @@ class Linebot::CallbackController < ApplicationController
             user.transit_to_updated!
             message = send_text("キャンセルしました")
           elsif recive_text == "現在の感染者数"
-            resent_prefecture_info = Api::Covid19.find_by(prefecture_name: user.prefecture.name)
-            previous_day_ratio = Api::Covid19.find_by_previous_day_ratio(prefecture_name: user.prefecture.name)
-            message = send_text(
-              pandemic_count(
-                prefecture: user.prefecture.name,
-                count: resent_prefecture_info["npatients"],
-                previous_day_ratio: previous_day_ratio
-              )
-            )
+            message = GenerateMessage::Covid19CountService.execute(user.prefecture.name)
             user.transit_to_updated!
           elsif recive_text == "自分の地域を設定"
             user.transit_to_prefecture_code_updatable!
@@ -77,12 +60,5 @@ class Linebot::CallbackController < ApplicationController
 
   def recive_text(event)
     event.message["text"]
-  end
-
-  def send_text(text)
-    {
-      type: "text",
-      text: text
-    }
   end
 end
