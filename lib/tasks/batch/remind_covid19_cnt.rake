@@ -7,7 +7,7 @@ namespace :batch do
     time = "#{Time.zone.now.strftime('%H:%M').chop}0"
     remind_time = RemindTime.find_time(time)
     User.where(remind_time_id: remind_time.id).each do |user|
-      message = GenerateMessage::Covid19CountService.execute(user.prefecture.name)
+      message = GenerateMessage::Covid19CountService.new.execute(user.prefecture.name)
       client.push_message(user.line_id, message)
     end
   end

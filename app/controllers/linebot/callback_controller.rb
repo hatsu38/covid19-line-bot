@@ -28,7 +28,7 @@ class Linebot::CallbackController < ApplicationController
             message = send_text("地域を「#{user.prefecture.name}」に変更しました")
           elsif new_pref_code
             pref_name = JpPrefecture::Prefecture.find(new_pref_code)&.name
-            message = GenerateMessage::Covid19CountService.execute(pref_name)
+            message = GenerateMessage::Covid19CountService.new.execute(pref_name)
           elsif new_remind_time && user.remind_time_updatable?
             ApplicationRecord.transaction { user.update_remind_time(new_remind_time.id) }
             message = send_text("毎日「#{new_remind_time.name_24}」に感染者数をお知らせします")
@@ -36,7 +36,7 @@ class Linebot::CallbackController < ApplicationController
             user.transit_to_updated!
             message = send_text("キャンセルしました")
           elsif recive_text == "現在の感染者数"
-            message = GenerateMessage::Covid19CountService.execute(user.prefecture.name)
+            message = GenerateMessage::Covid19CountService.new.execute(user.prefecture.name)
             user.transit_to_updated!
           elsif recive_text == "自分の地域を設定"
             user.transit_to_prefecture_code_updatable!
