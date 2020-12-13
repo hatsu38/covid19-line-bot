@@ -43,7 +43,7 @@ class Linebot::CallbackController < ApplicationController
             message = GenerateMessage::AreaSettingService.new.execute
           elsif recive_text == "通知時間を設定"
             user.transit_to_remind_time_updatable!
-            message = MessageTemplate::REMIND_TIME_SETTING
+            message = GenerateMessage::RemindTimeSettingService.new.execute
           end
           client.reply_message(event["replyToken"], message)
         when Line::Bot::Event::MessageType::Image, Line::Bot::Event::MessageType::Video
